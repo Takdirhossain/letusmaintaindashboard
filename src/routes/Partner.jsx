@@ -9,6 +9,9 @@ const Partner = () => {
   const [referralId, setReferralId] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [showTable, setShowTable] = useState(false);
+  const [payment, setpayment] = useState("")
+  const [paymentinfo, setpaymentinfo] = useState([])
+  const[filterdpayment, setfilterdpayment] = useState([])
   const [selectedPaymentOption, setSelectedPaymentOption] = useState("");
   const [tableData, setTableData] = useState([
     { date: "", leadName: "", solutionType: "", premisesCategory: "" },
@@ -34,6 +37,12 @@ const Partner = () => {
       .then((res) => res.json())
       .then((data) => setdata(data));
   }, []);
+  useEffect(()=> {
+    fetch(`http://localhost:5000/auth/payment/${payment}`)
+    .then((res) => res.json())
+    .then((data) => setpaymentinfo(data));
+  },[payment])
+
 
   const renderPartnerDashboard = () => {
     return (
@@ -522,25 +531,37 @@ const Partner = () => {
   };
 
   const renderPayoutMode = () => {
+  
     const handleCountryChange = (event) => {
-      setCountry(event.target.value);
-      setReferralId("");
-      setShowTable(false);
-      setSelectedPaymentOption("");
+     const selectedcountry = event.target.value;
+      setraffercountry(event.target.value);
+      setShowForm(false);
+      const countryfilter = data.filter(
+        (item) => item.country === selectedcountry
+      );
+      setCountry(countryfilter);
     };
 
     const handleReferralIdChange = (event) => {
-      setReferralId(event.target.value);
-      setShowTable(true);
-      setSelectedPaymentOption("");
+      const selectedreffer = event.target.value;
+     
+      setrafferid(event.target.value);
+      const refferidfilter = country.filter(
+        (item) => item.partnerId === selectedreffer
+      );
+      setReferralId(refferidfilter);
+      setpayment(selectedreffer)
     };
 
-    const handlePaymentOptionChange = (event) => {
-      setSelectedPaymentOption(event.target.value);
+    const handlePaymentOptionChange = (e) => {
+    const paymentmethod = e.target.value 
+    setSelectedPaymentOption(paymentmethod);
+    const seleteedpayment = paymentinfo.filter(item => item.payment.paymenttype === paymentmethod)
+    setfilterdpayment(seleteedpayment);
+    setShowTable(true)
     };
 
-    ;
-
+  
     return (
       <div>
         <div className="block w-full mb-5">
@@ -551,14 +572,19 @@ const Partner = () => {
             >
               Current Payout Mode of C.P.
             </label>
-            <select
+             <select
               id="country"
-              value={country}
-              onChange={handleCountryChange}
+              onChange={(e) => handleCountryChange(e)}
               className="mt-1 block w-full py-2 px-6 border border-gray-900 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
-              <option value="">-- Select Country --</option>
-              <option value="india">India</option>
+              <option>Select </option>
+              {data?.map((dt) => (
+                <>
+                  <option key={dt._id} value={dt?.country}>
+                    {dt.country}
+                  </option>
+                </>
+              ))}
               {/* Add country options */}
             </select>
           </div>
@@ -572,19 +598,22 @@ const Partner = () => {
               </label>
               <select
                 id="referralId"
-                value={referralId}
-                onChange={handleReferralIdChange}
-                className="mt-1 block w-full py-2 px-6 border border-gray-900 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                onChange={(e) => handleReferralIdChange(e)}
+                className="w-full px-4 py-2 border rounded"
               >
-                <option value="">-- Select Referral ID --</option>
-                <option value="referral1">Referral ID 1</option>
-                <option value="referral2">Referral ID 2</option>
-                {/* Add referral ID options based on the selected country */}
+                <option>-- Select Referral ID --</option>
+                {country?.map((dt) => (
+                  <>
+                    <option key={dt._id} value={dt?.partnerId}>
+                      {dt?.partnerId}
+                    </option>
+                  </>
+                ))}
               </select>
             </div>
           )}
 
-          {showTable && (
+           
             <div className="mt-5 mb-4 ">
               <label
                 htmlFor="paymentOption"
@@ -594,50 +623,52 @@ const Partner = () => {
               </label>
               <select
                 id="paymentOption"
-                value={selectedPaymentOption}
-                onChange={handlePaymentOptionChange}
+               
+                onChange={(e)=>handlePaymentOptionChange(e)}
                 className="mt-1 block w-full py-2 mb-6  px-6 border border-gray-900 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               >
                 <option value="">-- Select Payment Option --</option>
-                <option value="bankTransfer">Bank Transfer</option>
+                <option value="Bank Transfer">Bank Transfer</option>
                 <option value="paypal">PayPal</option>
-                <option value="paymentLink">Payment Link</option>
+                <option value="paymentlink">Payment Link</option>
               </select>
             </div>
-          )}
+          
 
-          {showTable && selectedPaymentOption === "bankTransfer" && (
+          {showTable && selectedPaymentOption === "Bank Transfer" && (
             <div className=" border-2 mt-2 border-graay-900 rounded-lg">
-              <div className="bg-white rounded-md shadow-sm  p-6 mt-2">
-                <h2 className="text-lg font-medium text-gray-700 mb-3">
-                  Bank Transfer Details:
-                </h2>
-                <p>
-                  <strong>Name of the Account Holder:</strong> John Doe
-                </p>
-                <p>
-                  <strong>Account Number:</strong> 1234567890
-                </p>
-                <p>
-                  <strong>Bank Name:</strong> ABC Bank
-                </p>
-                <p>
-                  <strong>Bank Address:</strong> 123 Main Street, City, Country
-                </p>
-                <p>
-                  <strong>SWIFT Code:</strong> ABCD1234
-                </p>
-                <p>
-                  <strong>IFSC Code:</strong> IFSC1234
-                </p>
-                <p>
-                  <strong>Mobile Number:</strong> 123-456-7890
-                </p>
-                <p>
-                  <strong>Your Address:</strong> 456 Suburb Street, City,
-                  Country
-                </p>
-              </div>
+             {
+              filterdpayment?.map(item=> <div className="bg-white rounded-md shadow-sm  p-6 mt-2">
+              <h2 className="text-lg font-medium text-gray-700 mb-3">
+                Bank Transfer Details:
+              </h2>
+              <p>
+                <strong>{item}</strong> 
+              </p>
+              <p>
+                <strong>Account Number:</strong> 1234567890
+              </p>
+              <p>
+                <strong>Bank Name:</strong> ABC Bank
+              </p>
+              <p>
+                <strong>Bank Address:</strong> 123 Main Street, City, Country
+              </p>
+              <p>
+                <strong>SWIFT Code:</strong> ABCD1234
+              </p>
+              <p>
+                <strong>IFSC Code:</strong> IFSC1234
+              </p>
+              <p>
+                <strong>Mobile Number:</strong> 123-456-7890
+              </p>
+              <p>
+                <strong>Your Address:</strong> 456 Suburb Street, City,
+                Country
+              </p>
+            </div> )
+             }
             </div>
           )}
 
@@ -660,7 +691,7 @@ const Partner = () => {
             </div>
           )}
 
-          {showTable && selectedPaymentOption === "paymentLink" && (
+          {showTable && selectedPaymentOption === "paymentlink" && (
             <div className="mt-5">
               <div className="bg-white rounded-md shadow-sm p-4">
                 <h2 className="text-lg font-medium text-gray-700 mb-3">
