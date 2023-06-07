@@ -643,29 +643,29 @@ const Partner = () => {
                 Bank Transfer Details:
               </h2>
               <p>
-                <strong>{item}</strong> 
+                <strong>{item.payment.accountHolderName}</strong> 
               </p>
               <p>
-                <strong>Account Number:</strong> 1234567890
+                <strong>Account Number:</strong> {item.payment.accountNumber}
               </p>
               <p>
-                <strong>Bank Name:</strong> ABC Bank
+                <strong>Bank Name:</strong> {item.payment.bankName}
               </p>
               <p>
-                <strong>Bank Address:</strong> 123 Main Street, City, Country
+                <strong>Bank Address:</strong> {item.payment.bankaddress}
               </p>
               <p>
-                <strong>SWIFT Code:</strong> ABCD1234
+                <strong>SWIFT Code:</strong> {item.payment.swiftCode}
               </p>
               <p>
-                <strong>IFSC Code:</strong> IFSC1234
+                <strong>IFSC Code:</strong> {item.payment.ifscCode}
               </p>
               <p>
-                <strong>Mobile Number:</strong> 123-456-7890
+                <strong>Mobile Number:</strong> {item.payment.mobileNumber}
               </p>
               <p>
-                <strong>Your Address:</strong> 456 Suburb Street, City,
-                Country
+                <strong>Your Address:</strong> {item.payment.youraddress}
+              
               </p>
             </div> )
              }
@@ -674,33 +674,31 @@ const Partner = () => {
 
           {showTable && selectedPaymentOption === "paypal" && (
             <div className="mt-5">
-              <div className="bg-white rounded-md shadow-sm p-4">
+              {filterdpayment.map(item=>  <div className="bg-white rounded-md shadow-sm p-4">
                 <h2 className="text-lg font-medium text-gray-700 mb-3">
                   PayPal Details:
                 </h2>
                 <p>
-                  <strong>PayPal Email:</strong> johndoe@example.com
+                  <strong>PayPal address:</strong> {item.payment.paypal}
                 </p>
-                <p>
-                  <strong>Account Name:</strong> John Doe
-                </p>
-                <p>
-                  <strong>Address:</strong> 123 PayPal Street, City, Country
-                </p>
-              </div>
+               
+              </div>)}
+             
             </div>
           )}
 
           {showTable && selectedPaymentOption === "paymentlink" && (
             <div className="mt-5">
-              <div className="bg-white rounded-md shadow-sm p-4">
+              {
+                filterdpayment.map(item=> <div className="bg-white rounded-md shadow-sm p-4">
                 <h2 className="text-lg font-medium text-gray-700 mb-3">
                   Payment Link:
                 </h2>
                 <p>
-                  <strong>Link:</strong> https://helloWorld!.com/
+                  <strong>Link:</strong> {item.payment.paymentlink}
                 </p>
-              </div>
+              </div>)
+              }
             </div>
           )}
         </div>
